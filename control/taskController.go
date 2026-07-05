@@ -2,6 +2,7 @@ package control
 
 import (
 	"errors"
+	"strings"
 	"taskmanager/domain"
 )
 
@@ -27,8 +28,16 @@ func (tc *TaskController) RemoveTask(args []string) (string, error) {
 }
 
 func (tc *TaskController) ListTasks(args []string) (string, error) {
-	// Implementation for listing all the tasks
-	return "", nil
+	sep := "-----------------------------------------------------------\n"
+	var sb strings.Builder
+	sb.WriteString(sep)
+
+	for _, v := range tc.taskMap {
+		sb.WriteString(v.ShowDetails())
+		sb.WriteString("\n")
+		sb.WriteString(sep)
+	}
+	return sb.String(), nil
 }
 
 func (tc *TaskController) CompleteTask(args []string) (string, error) {
