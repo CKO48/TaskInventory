@@ -22,7 +22,7 @@ func NewStandartTask(title, description string, done bool) StandartTask {
 }
 
 func (t StandartTask) ShowDetails() string {
-	return fmt.Sprintf("Title: %s | Description: %s | Done: %s", t.title, t.description, t.done)
+	return fmt.Sprintf("Title: %s | Description: %s | Done: %t", t.title, t.description, t.done)
 }
 
 func (t StandartTask) isDone() bool { return t.done }
