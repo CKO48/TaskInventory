@@ -8,19 +8,19 @@ type StandartTask struct {
 	done        bool
 }
 
-func NewStandartTask(title, description string, done bool) StandartTask {
-	return StandartTask{
+func NewStandartTask(title, description string, done bool) *StandartTask {
+	return &StandartTask{
 		title:       title,
 		description: description,
 		done:        done,
 	}
 }
 
-func (t StandartTask) ShowDetails() string {
+func (t *StandartTask) ShowDetails() string {
 	return fmt.Sprintf("Title: %s | Description: %s | Done: %t", t.title, t.description, t.done)
 }
 
-func (t StandartTask) IsDone() bool { return t.done }
+func (t *StandartTask) IsDone() bool { return t.done }
 
 func (t *StandartTask) Complete() {
 	t.done = true
