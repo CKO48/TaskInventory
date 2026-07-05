@@ -32,7 +32,7 @@ func (tc *TaskController) ListTasks(args []string) (string, error) {
 }
 
 func (tc *TaskController) CompleteTask(args []string) (string, error) {
-	if len(args) < 1 {
+	if len(args) < 2 {
 		return "", errors.New("No task specified")
 	}
 
