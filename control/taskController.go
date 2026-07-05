@@ -1,6 +1,9 @@
 package control
 
-import "taskmanager/domain"
+import (
+	"errors"
+	"taskmanager/domain"
+)
 
 type TaskController struct {
 	taskMap map[string]domain.Task
@@ -23,12 +26,22 @@ func (tc *TaskController) RemoveTask(args []string) (string, error) {
 	return "", nil
 }
 
-func (tc TaskController) ListTasks(args []string) (string, error) {
+func (tc *TaskController) ListTasks(args []string) (string, error) {
 	// Implementation for listing all the tasks
 	return "", nil
 }
 
-func (tc TaskController) CompleteTask(args []string) (string, error) {
-	// Implementation for completing a task
-	return "", nil
+func (tc *TaskController) CompleteTask(args []string) (string, error) {
+	if len(args) < 1 {
+		return "", errors.New("No task specified")
+	}
+
+	task, exists := tc.taskMap[args[1]]
+
+	if exists {
+		task.Complete()
+		return "Task completed successfully", nil
+	}
+
+	return "", errors.New("Task not found")
 }
