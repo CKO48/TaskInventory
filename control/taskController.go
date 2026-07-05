@@ -23,8 +23,18 @@ func (tc *TaskController) AddTask(args []string) (string, error) {
 }
 
 func (tc *TaskController) RemoveTask(args []string) (string, error) {
-	// Implementation for removing a task
-	return "", nil
+	if len(args) < 2 {
+		return "", errors.New("No task specified")
+	}
+
+	_, exists := tc.taskMap[args[1]]
+
+	if !exists {
+		return "", errors.New("Task not found")
+	}
+	delete(tc.taskMap, args[1])
+
+	return "Task removed successfully", nil
 }
 
 func (tc *TaskController) ListTasks(args []string) (string, error) {
