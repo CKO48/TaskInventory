@@ -7,14 +7,14 @@ type Task interface {
 	isDone() bool
 }
 
-type standartTask struct {
+type StandartTask struct {
 	title       string
 	description string
 	done        bool
 }
 
-func (t standartTask) ShowDetails() string {
+func (t StandartTask) ShowDetails() string {
 	return fmt.Sprintf("Title: %s | Description: %s | Done: %s", t.title, t.description, t.done)
 }
 
-func (t standartTask) isDone() bool { return t.done }
+func (t StandartTask) isDone() bool { return t.done }
