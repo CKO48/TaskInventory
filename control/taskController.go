@@ -3,11 +3,14 @@ package control
 import "taskmanager/domain"
 
 type TaskController struct {
-	taskmap map[string]domain.Task
+	taskMap map[string]domain.Task
 }
 
-func NewTaskController(taskmap map[string]domain.Task) TaskController {
-	return TaskController{taskmap}
+func NewTaskController(taskMap map[string]domain.Task) *TaskController {
+	if taskMap == nil {
+		taskMap = make(map[string]domain.Task)
+	}
+	return &TaskController{taskMap: taskMap}
 }
 
 func (tc *TaskController) AddTask(args []string) (string, error) {
