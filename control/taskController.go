@@ -26,12 +26,12 @@ func (tc *TaskController) RemoveTask(args []string) (string, error) {
 	return "", nil
 }
 
-func (tc TaskController) ListTasks(args []string) (string, error) {
+func (tc *TaskController) ListTasks(args []string) (string, error) {
 	// Implementation for listing all the tasks
 	return "", nil
 }
 
-func (tc TaskController) CompleteTask(args []string) (string, error) {
+func (tc *TaskController) CompleteTask(args []string) (string, error) {
 	if len(args) < 1 {
 		return "", errors.New("No task specified")
 	}
