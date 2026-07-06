@@ -18,8 +18,24 @@ func NewTaskController(taskMap map[string]domain.Task) *TaskController {
 }
 
 func (tc *TaskController) AddTask(args []string) (string, error) {
-	// Implementation for adding a task
-	return "", nil
+	if len(args) < 2 {
+		return "", errors.New("All tasks must have a title")
+	}
+
+	var newTask domain.Task
+	var description string
+	var title string = args[1]
+
+	if len(args) > 2 {
+		description = args[2]
+	} else {
+		description = ""
+	}
+
+	newTask = domain.NewStandartTask(title, description, false)
+
+	tc.taskMap[title] = newTask
+	return "Task added successfully", nil
 }
 
 func (tc *TaskController) RemoveTask(args []string) (string, error) {
