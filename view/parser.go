@@ -21,6 +21,11 @@ func Parse(input string) ([]string, error) {
 	switch cmd {
 
 	case "add":
+
+		if len(tokens) < 2 {
+			return nil, errors.New("missing title")
+		}
+
 		var title = tokens[1]
 
 		valid, err := isValidTitle(title)
@@ -49,6 +54,11 @@ func Parse(input string) ([]string, error) {
 		return args, nil
 
 	case "remove":
+
+		if len(tokens) < 2 {
+			return nil, errors.New("missing title")
+		}
+
 		var title = tokens[1]
 
 		valid, err := isValidTitle(title)
@@ -62,6 +72,11 @@ func Parse(input string) ([]string, error) {
 		return args, nil
 
 	case "complete":
+
+		if len(tokens) < 2 {
+			return nil, errors.New("missing title")
+		}
+
 		var title = tokens[1]
 
 		valid, err := isValidTitle(title)
@@ -72,6 +87,9 @@ func Parse(input string) ([]string, error) {
 			return nil, err
 		}
 
+		return args, nil
+
+	case "help", "exit":
 		return args, nil
 
 	default:
