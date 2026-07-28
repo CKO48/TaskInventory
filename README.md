@@ -6,7 +6,7 @@ It uses a local, on-disk SQLite database to store the tasks, so no data will be 
 After opening the app, you can do any of the following actions:
 
 - list                          -> List all your tasks
-- add [taskname] [description]  -> Add a new task
+- add [taskname] -d [description]  -> Add a new task
 - remove [taskname]             -> Remove task with given name
 - complete [taskname]           -> Mark the task as completed
 
