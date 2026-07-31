@@ -3,7 +3,6 @@ module taskmanager
 go 1.26.4
 
 require (
-	github.com/glebarez/go-sqlite v1.22.0
 	modernc.org/sqlite v1.55.0
 )
 
