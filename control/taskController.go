@@ -39,11 +39,8 @@ func NewTaskController() *TaskController {
 }
 
 /*
-Adds a new task to the task map.
-
-The args slice should contain the command, title, and optionally a description.
-
-Returns a success message or an error if the title is missing.
+Adds a new task to the task map based on the provided title and optional description in the args slice.
+Returns a success message or an error if the title is not provided or if there is an issue saving the task to the database.
 */
 func (tc *TaskController) AddTask(args []string) (string, error) {
 	if len(args) < 2 {
@@ -73,7 +70,6 @@ func (tc *TaskController) AddTask(args []string) (string, error) {
 
 /*
 Removes a task from the task map based on the provided title in the args slice.
-
 Returns a success message or an error if the task is not found or if no title is specified.
 */
 func (tc *TaskController) RemoveTask(args []string) (string, error) {
@@ -114,9 +110,10 @@ func (tc *TaskController) ListTasks(args []string) (string, error) {
 	return sb.String(), nil
 }
 
-// Completes a task in the task map based on the provided title in the args slice.
-//
-// Returns a success message or an error if the task is not found or if no title is specified.
+/*
+marks a task as completed based on the provided title in the args slice.
+Returns a success message or an error if the task is not found or if no title is specified.
+*/
 func (tc *TaskController) CompleteTask(args []string) (string, error) {
 	if len(args) < 2 {
 		return "", errors.New("No task specified")
@@ -126,7 +123,10 @@ func (tc *TaskController) CompleteTask(args []string) (string, error) {
 
 	if exists {
 		task.Complete()
-
+		_, err := tc.db.SaveTask(task.GetTitle(), task.GetDescription(), task.GetStatus())
+		if err != nil {
+			return "", err
+		}
 		return "Task completed successfully", nil
 	}
 
