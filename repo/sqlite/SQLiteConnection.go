@@ -15,7 +15,7 @@ type SQLiteConnection struct {
 
 // Initializes the SQLite database and creates the tasks table if it doesn't exist
 func InitSQLiteDB() (*SQLiteConnection, error) {
-	db, err := sql.Open("sqlite", "./my.db")
+	db, err := sql.Open("sqlite", "C:\\Users\\Kike\\Dev\\my.db")
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +34,7 @@ func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task,
 	const query = `
 		SELECT title, description, done
 		FROM tasks;
+	
 	`
 
 	rows, err := conn.db.QueryContext(ctx, query)
@@ -61,28 +62,24 @@ func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task,
 		tasks[title] = domain.NewStandartTask(title, description, done)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
 	return tasks, nil
 }
 
 // adds a new task to the database or updates an existing task if it already exists
-func (conn *SQLiteConnection) SaveTask(name string, description string, status bool) (sql.Result, error) {
-	sql := `INSERT INTO tasks (name, description, status) 
+func (conn *SQLiteConnection) SaveTask(title string, description string, done bool) (sql.Result, error) {
+	sql := `INSERT INTO tasks (title, description, done) 
 			VALUES (?, ?, ?)
-			ON CONFLICT(name)
+			ON CONFLICT(title)
 			DO UPDATE SET
 				description = excluded.description,
-				status = excluded.status;`
-	return conn.db.Exec(sql, name, description, status)
+				done = excluded.done;`
+	return conn.db.Exec(sql, title, description, done)
 }
 
-// Deletes a task from the database based on its name
-func (conn *SQLiteConnection) DeleteTask(name string) (sql.Result, error) {
-	sql := `DELETE FROM tasks WHERE name = ?;`
-	return conn.db.Exec(sql, name)
+// Deletes a task from the database based on its title
+func (conn *SQLiteConnection) DeleteTask(title string) (sql.Result, error) {
+	sql := `DELETE FROM tasks WHERE title = ?;`
+	return conn.db.Exec(sql, title)
 }
 
 // closes the database connection
