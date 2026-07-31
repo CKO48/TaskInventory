@@ -1,9 +1,14 @@
 package repo
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+	"taskmanager/domain"
+)
 
 type Database interface {
-	InsertTask(name string, description string) (sql.Result, error)
+	SaveTask(name string, description string) (sql.Result, error)
 	DeleteTask(name string) (sql.Result, error)
+	Load(ctx context.Context) (map[string]domain.Task, error)
 	Close() error
 }
