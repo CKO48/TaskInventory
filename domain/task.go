@@ -5,4 +5,7 @@ type Task interface {
 	ShowDetails() string
 	IsDone() bool
 	Complete()
+	GetTitle() string
+	GetDescription() string
+	GetStatus() bool
 }

@@ -1,9 +1,13 @@
 package control
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"taskmanager/domain"
+	"taskmanager/repo"
+	sqlite "taskmanager/repo/sqlite"
+	"time"
 )
 
 /*
@@ -11,26 +15,32 @@ TaskController is responsible for managing tasks in the task map.
 */
 type TaskController struct {
 	taskMap map[string]domain.Task
+	db      repo.Database
 }
 
 /*
-Create a new TaskController with the provided task map.
-
-If the task map is nil, a new empty map will be created
+Create a new instance of a TaskController
 */
-func NewTaskController(taskMap map[string]domain.Task) *TaskController {
-	if taskMap == nil {
-		taskMap = make(map[string]domain.Task)
+func NewTaskController() *TaskController {
+	db, err := sqlite.InitSQLiteDB()
+	if err != nil {
+		panic(err)
 	}
-	return &TaskController{taskMap: taskMap}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	taskMap, err := db.Load(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return &TaskController{taskMap: taskMap, db: db}
 }
 
 /*
-Adds a new task to the task map.
-
-The args slice should contain the command, title, and optionally a description.
-
-Returns a success message or an error if the title is missing.
+Adds a new task to the task map based on the provided title and optional description in the args slice.
+Returns a success message or an error if the title is not provided or if there is an issue saving the task to the database.
 */
 func (tc *TaskController) AddTask(args []string) (string, error) {
 	if len(args) < 2 {
@@ -50,12 +60,16 @@ func (tc *TaskController) AddTask(args []string) (string, error) {
 	newTask = domain.NewStandartTask(title, description, false)
 
 	tc.taskMap[title] = newTask
+	_, err := tc.db.SaveTask(title, description, false)
+	if err != nil {
+		return "", err
+	}
+
 	return "Task added successfully", nil
 }
 
 /*
 Removes a task from the task map based on the provided title in the args slice.
-
 Returns a success message or an error if the task is not found or if no title is specified.
 */
 func (tc *TaskController) RemoveTask(args []string) (string, error) {
@@ -63,12 +77,17 @@ func (tc *TaskController) RemoveTask(args []string) (string, error) {
 		return "", errors.New("No task specified")
 	}
 
-	_, exists := tc.taskMap[args[1]]
+	var title string = args[1]
+	_, exists := tc.taskMap[title]
 
 	if !exists {
 		return "", errors.New("Task not found")
 	}
-	delete(tc.taskMap, args[1])
+	delete(tc.taskMap, title)
+	_, err := tc.db.DeleteTask(title)
+	if err != nil {
+		return "", err
+	}
 
 	return "Task removed successfully", nil
 }
@@ -91,9 +110,10 @@ func (tc *TaskController) ListTasks(args []string) (string, error) {
 	return sb.String(), nil
 }
 
-// Completes a task in the task map based on the provided title in the args slice.
-//
-// Returns a success message or an error if the task is not found or if no title is specified.
+/*
+marks a task as completed based on the provided title in the args slice.
+Returns a success message or an error if the task is not found or if no title is specified.
+*/
 func (tc *TaskController) CompleteTask(args []string) (string, error) {
 	if len(args) < 2 {
 		return "", errors.New("No task specified")
@@ -103,6 +123,10 @@ func (tc *TaskController) CompleteTask(args []string) (string, error) {
 
 	if exists {
 		task.Complete()
+		_, err := tc.db.SaveTask(task.GetTitle(), task.GetDescription(), task.GetStatus())
+		if err != nil {
+			return "", err
+		}
 		return "Task completed successfully", nil
 	}
 
