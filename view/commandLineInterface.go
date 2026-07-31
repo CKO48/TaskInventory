@@ -15,7 +15,7 @@ type CLI struct {
 var taskController *control.TaskController
 
 func NewCLI() *CLI {
-	return &CLI{tc: *control.NewTaskController(nil)}
+	return &CLI{tc: *control.NewTaskController()}
 }
 
 func (cli *CLI) StartCommandLineInterface() {
