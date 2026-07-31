@@ -15,7 +15,7 @@ type SQLiteConnection struct {
 
 // Initializes the SQLite database and creates the tasks table if it doesn't exist
 func InitSQLiteDB() (*SQLiteConnection, error) {
-	db, err := sql.Open("sqlite", "C:\\Users\\Kike\\Dev\\my.db")
+	db, err := sql.Open("sqlite", "./my.db")
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +60,10 @@ func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task,
 		}
 
 		tasks[title] = domain.NewStandartTask(title, description, done)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return tasks, nil
