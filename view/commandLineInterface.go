@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"taskmanager/control"
+	"time"
 )
 
 type CLI struct {
@@ -14,10 +15,12 @@ type CLI struct {
 
 var taskController *control.TaskController
 
+// returns a cli with its own task controller
 func NewCLI() *CLI {
 	return &CLI{tc: *control.NewTaskController()}
 }
 
+// StartCommandLineInterface starts the command-line interface for the task manager.
 func (cli *CLI) StartCommandLineInterface() {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -44,14 +47,17 @@ func (cli *CLI) StartCommandLineInterface() {
 	}
 }
 
+// prints a help menu for the user
 func printHelp() {
 	fmt.Println("Available commands:")
-	fmt.Println("  add <title> [-d <description>] - Add a new task with the specified title and optional description.")
-	fmt.Println("  list [-c] - List all tasks or only completed tasks.")
-	fmt.Println("  remove <title> - Remove a task with the specified title.")
+	fmt.Println("  add <\"title\"> [-d <description>] - Add a new task with the specified title and optional description.")
+	fmt.Println("  complete <\"title\"> - Mark a task as completed.")
+	fmt.Println("  list - List all tasks or only completed tasks.")
+	fmt.Println("  remove <\"title\"> - Remove a task with the specified title.")
 	fmt.Println("  help - Display this help message.")
 }
 
+// handleCommand processes the command based on the provided arguments and returns an exit code and an error if any.
 func (cli *CLI) handleCommand(args []string) (int, error) {
 	if len(args) == 0 {
 		fmt.Println("No command provided. Type 'help' for available commands.")
@@ -95,6 +101,11 @@ func (cli *CLI) handleCommand(args []string) (int, error) {
 		printHelp()
 
 	case "exit":
+		err := cli.tc.Close()
+		if err != nil {
+			fmt.Println("Error closing database connection:", err)
+			time.Sleep(5 * time.Second)
+		}
 		fmt.Println("Exiting TaskInventory. Goodbye!")
 		return 0, nil
 

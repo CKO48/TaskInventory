@@ -6,14 +6,18 @@ import (
 	"taskmanager/domain"
 	"taskmanager/repo"
 
-	_ "modernc.org/sqlite" // Driver para SQLite
+	_ "modernc.org/sqlite"
 )
 
 type SQLiteRepo struct {
 	db *sql.DB
 }
 
-// InitSQLiteDB crea/abre la base de datos, asegura la creación de la tabla e inicializa la estructura.
+/*
+InitSQLiteDB creates or opens the database
+
+Also ensures the table is created
+*/
 func InitSQLiteDB() (repo.Database, error) {
 	db, err := sql.Open("sqlite", "./tasks.db")
 	if err != nil {
@@ -36,7 +40,7 @@ func InitSQLiteDB() (repo.Database, error) {
 	return &SQLiteRepo{db: db}, nil
 }
 
-// SaveTask inserta una nueva tarea o actualiza su descripción/estado si ya existe (UPSERT).
+// SaveTask inserts a new task or updates its description/status if it already exists (UPSERT).
 func (r *SQLiteRepo) SaveTask(name string, description string, status bool) (sql.Result, error) {
 	query := `
 	INSERT INTO tasks (title, description, status) 
@@ -48,13 +52,13 @@ func (r *SQLiteRepo) SaveTask(name string, description string, status bool) (sql
 	return r.db.Exec(query, name, description, status)
 }
 
-// DeleteTask elimina una tarea por su título.
+// DeleteTask deletes a task from the database based on its title.
 func (r *SQLiteRepo) DeleteTask(name string) (sql.Result, error) {
 	query := `DELETE FROM tasks WHERE title = ?;`
 	return r.db.Exec(query, name)
 }
 
-// Load recupera todas las tareas registradas de la base de datos usando el contexto.
+// Load loads all tasks from the database and returns them as a map of title to Task.
 func (r *SQLiteRepo) Load(ctx context.Context) (map[string]domain.Task, error) {
 	query := `SELECT title, description, status FROM tasks;`
 
@@ -86,7 +90,7 @@ func (r *SQLiteRepo) Load(ctx context.Context) (map[string]domain.Task, error) {
 	return tasks, nil
 }
 
-// Close cierra la conexión activa con SQLite.
+// Close closes the database connection.
 func (r *SQLiteRepo) Close() error {
 	return r.db.Close()
 }
