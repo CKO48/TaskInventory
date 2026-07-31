@@ -1,43 +1,64 @@
 package repo
 
 import (
-	"database/sql"
-
 	"context"
+	"database/sql"
 	"taskmanager/domain"
+	"taskmanager/repo"
 
-	_ "github.com/glebarez/go-sqlite"
+	_ "modernc.org/sqlite" // Driver para SQLite
 )
 
-type SQLiteConnection struct {
+type SQLiteRepo struct {
 	db *sql.DB
 }
 
-// Initializes the SQLite database and creates the tasks table if it doesn't exist
-func InitSQLiteDB() (*SQLiteConnection, error) {
-	db, err := sql.Open("sqlite", "./my.db")
+// InitSQLiteDB crea/abre la base de datos, asegura la creación de la tabla e inicializa la estructura.
+func InitSQLiteDB() (repo.Database, error) {
+	db, err := sql.Open("sqlite", "./tasks.db")
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = createTable(db)
+	query := `
+	CREATE TABLE IF NOT EXISTS tasks (
+		title TEXT PRIMARY KEY,
+		description TEXT,
+		status BOOLEAN NOT NULL
+	);`
+
+	_, err = db.Exec(query)
 	if err != nil {
 		db.Close()
 		return nil, err
 	}
 
-	return &SQLiteConnection{db: db}, nil
+	return &SQLiteRepo{db: db}, nil
 }
 
-// Load retrieves all tasks from the database and returns them as a map of task names to Task objects
-func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task, error) {
-	const query = `
-		SELECT title, description, done
-		FROM tasks;
-	
-	`
+// SaveTask inserta una nueva tarea o actualiza su descripción/estado si ya existe (UPSERT).
+func (r *SQLiteRepo) SaveTask(name string, description string, status bool) (sql.Result, error) {
+	query := `
+	INSERT INTO tasks (title, description, status) 
+	VALUES (?, ?, ?)
+	ON CONFLICT(title) DO UPDATE SET
+		description = excluded.description,
+		status = excluded.status;`
 
-	rows, err := conn.db.QueryContext(ctx, query)
+	return r.db.Exec(query, name, description, status)
+}
+
+// DeleteTask elimina una tarea por su título.
+func (r *SQLiteRepo) DeleteTask(name string) (sql.Result, error) {
+	query := `DELETE FROM tasks WHERE title = ?;`
+	return r.db.Exec(query, name)
+}
+
+// Load recupera todas las tareas registradas de la base de datos usando el contexto.
+func (r *SQLiteRepo) Load(ctx context.Context) (map[string]domain.Task, error) {
+	query := `SELECT title, description, status FROM tasks;`
+
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -46,20 +67,16 @@ func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task,
 	tasks := make(map[string]domain.Task)
 
 	for rows.Next() {
-		var title string
-		var description string
-		var done bool
+		var title, description string
+		var status bool
 
-		err := rows.Scan(
-			&title,
-			&description,
-			&done,
-		)
-		if err != nil {
+		if err := rows.Scan(&title, &description, &status); err != nil {
 			return nil, err
 		}
 
-		tasks[title] = domain.NewStandartTask(title, description, done)
+		// Se asume la función constructora domain.NewStandartTask(title, description, status)
+		task := domain.NewStandartTask(title, description, status)
+		tasks[title] = task
 	}
 
 	if err := rows.Err(); err != nil {
@@ -69,24 +86,7 @@ func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task,
 	return tasks, nil
 }
 
-// adds a new task to the database or updates an existing task if it already exists
-func (conn *SQLiteConnection) SaveTask(title string, description string, done bool) (sql.Result, error) {
-	sql := `INSERT INTO tasks (title, description, done) 
-			VALUES (?, ?, ?)
-			ON CONFLICT(title)
-			DO UPDATE SET
-				description = excluded.description,
-				done = excluded.done;`
-	return conn.db.Exec(sql, title, description, done)
-}
-
-// Deletes a task from the database based on its title
-func (conn *SQLiteConnection) DeleteTask(title string) (sql.Result, error) {
-	sql := `DELETE FROM tasks WHERE title = ?;`
-	return conn.db.Exec(sql, title)
-}
-
-// closes the database connection
-func (conn *SQLiteConnection) Close() error {
-	return conn.db.Close()
+// Close cierra la conexión activa con SQLite.
+func (r *SQLiteRepo) Close() error {
+	return r.db.Close()
 }

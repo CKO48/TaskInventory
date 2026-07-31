@@ -3,7 +3,7 @@ package repo
 import (
 	"database/sql"
 
-	_ "github.com/glebarez/go-sqlite"
+	_ "modernc.org/sqlite"
 )
 
 func createTable(db *sql.DB) (sql.Result, error) {
