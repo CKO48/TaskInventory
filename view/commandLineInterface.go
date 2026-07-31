@@ -46,9 +46,10 @@ func (cli *CLI) StartCommandLineInterface() {
 
 func printHelp() {
 	fmt.Println("Available commands:")
-	fmt.Println("  add <title> [-d <description>] - Add a new task with the specified title and optional description.")
-	fmt.Println("  list [-c] - List all tasks or only completed tasks.")
-	fmt.Println("  remove <title> - Remove a task with the specified title.")
+	fmt.Println("  add <\"title\"> [-d <description>] - Add a new task with the specified title and optional description.")
+	fmt.Println("  complete <\"title\"> - Mark a task as completed.")
+	fmt.Println("  list - List all tasks or only completed tasks.")
+	fmt.Println("  remove <\"title\"> - Remove a task with the specified title.")
 	fmt.Println("  help - Display this help message.")
 }
 
