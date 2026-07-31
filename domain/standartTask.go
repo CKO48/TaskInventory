@@ -28,3 +28,15 @@ func (t *StandartTask) ShowDetails() string {
 func (t *StandartTask) IsDone() bool { return t.done }
 
 func (t *StandartTask) Complete() { t.done = true }
+
+func (t *StandartTask) GetTitle() string {
+	return t.title
+}
+
+func (t *StandartTask) GetDescription() string {
+	return t.description
+}
+
+func (t *StandartTask) GetStatus() bool {
+	return t.done
+}
