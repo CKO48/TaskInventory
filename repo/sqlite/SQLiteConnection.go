@@ -3,6 +3,8 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"os"
+	"path/filepath"
 	"taskmanager/domain"
 	"taskmanager/repo"
 
@@ -19,7 +21,20 @@ InitSQLiteDB creates or opens the database
 Also ensures the table is created
 */
 func InitSQLiteDB() (repo.Database, error) {
-	db, err := sql.Open("sqlite", "./tasks.db")
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	appDir := filepath.Join(homeDir, "TaskInventory")
+
+	if err := os.MkdirAll(appDir, 0755); err != nil {
+		return nil, err
+	}
+
+	dbPath := filepath.Join(appDir, "tasks.db")
+
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
 	}
