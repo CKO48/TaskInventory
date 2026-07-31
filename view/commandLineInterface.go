@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"taskmanager/control"
+	"time"
 )
 
 type CLI struct {
@@ -100,6 +101,11 @@ func (cli *CLI) handleCommand(args []string) (int, error) {
 		printHelp()
 
 	case "exit":
+		err := cli.tc.Close()
+		if err != nil {
+			fmt.Println("Error closing database connection:", err)
+			time.Sleep(5 * time.Second)
+		}
 		fmt.Println("Exiting TaskInventory. Goodbye!")
 		return 0, nil
 

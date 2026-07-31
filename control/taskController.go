@@ -132,3 +132,8 @@ func (tc *TaskController) CompleteTask(args []string) (string, error) {
 
 	return "", errors.New("Task not found")
 }
+
+// Close closes the database connection associated with the TaskController.
+func (tc *TaskController) Close() error {
+	return tc.db.Close()
+}
