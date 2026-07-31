@@ -1,9 +1,13 @@
 package control
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"taskmanager/domain"
+	"taskmanager/repo"
+	sqlite "taskmanager/repo/sqlite"
+	"time"
 )
 
 /*
@@ -11,18 +15,27 @@ TaskController is responsible for managing tasks in the task map.
 */
 type TaskController struct {
 	taskMap map[string]domain.Task
+	db      repo.Database
 }
 
 /*
-Create a new TaskController with the provided task map.
-
-If the task map is nil, a new empty map will be created
+Create a new instance of a TaskController
 */
-func NewTaskController(taskMap map[string]domain.Task) *TaskController {
-	if taskMap == nil {
-		taskMap = make(map[string]domain.Task)
+func NewTaskController() *TaskController {
+	db, err := sqlite.InitSQLiteDB()
+	if err != nil {
+		panic(err)
 	}
-	return &TaskController{taskMap: taskMap}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	taskMap, err := db.Load(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return &TaskController{taskMap: taskMap, db: db}
 }
 
 /*
