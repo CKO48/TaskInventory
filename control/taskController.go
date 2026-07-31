@@ -63,6 +63,11 @@ func (tc *TaskController) AddTask(args []string) (string, error) {
 	newTask = domain.NewStandartTask(title, description, false)
 
 	tc.taskMap[title] = newTask
+	_, err := tc.db.SaveTask(title, description, false)
+	if err != nil {
+		return "", err
+	}
+
 	return "Task added successfully", nil
 }
 
@@ -76,12 +81,17 @@ func (tc *TaskController) RemoveTask(args []string) (string, error) {
 		return "", errors.New("No task specified")
 	}
 
-	_, exists := tc.taskMap[args[1]]
+	var title string = args[1]
+	_, exists := tc.taskMap[title]
 
 	if !exists {
 		return "", errors.New("Task not found")
 	}
-	delete(tc.taskMap, args[1])
+	delete(tc.taskMap, title)
+	_, err := tc.db.DeleteTask(title)
+	if err != nil {
+		return "", err
+	}
 
 	return "Task removed successfully", nil
 }
@@ -116,6 +126,7 @@ func (tc *TaskController) CompleteTask(args []string) (string, error) {
 
 	if exists {
 		task.Complete()
+
 		return "Task completed successfully", nil
 	}
 

@@ -69,14 +69,14 @@ func (conn *SQLiteConnection) Load(ctx context.Context) (map[string]domain.Task,
 }
 
 // adds a new task to the database or updates an existing task if it already exists
-func (conn *SQLiteConnection) SaveTask(name string, description string) (sql.Result, error) {
+func (conn *SQLiteConnection) SaveTask(name string, description string, status bool) (sql.Result, error) {
 	sql := `INSERT INTO tasks (name, description, status) 
 			VALUES (?, ?, ?)
 			ON CONFLICT(name)
 			DO UPDATE SET
 				description = excluded.description,
 				status = excluded.status;`
-	return conn.db.Exec(sql, name, description, false)
+	return conn.db.Exec(sql, name, description, status)
 }
 
 // Deletes a task from the database based on its name
