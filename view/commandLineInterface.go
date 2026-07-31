@@ -24,6 +24,7 @@ func NewCLI() *CLI {
 func (cli *CLI) StartCommandLineInterface() {
 	reader := bufio.NewReader(os.Stdin)
 
+	fmt.Println(banner)
 	fmt.Println("Welcome to TaskInventory!")
 
 	for {
