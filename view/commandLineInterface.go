@@ -14,10 +14,12 @@ type CLI struct {
 
 var taskController *control.TaskController
 
+// returns a cli with its own task controller
 func NewCLI() *CLI {
 	return &CLI{tc: *control.NewTaskController()}
 }
 
+// StartCommandLineInterface starts the command-line interface for the task manager.
 func (cli *CLI) StartCommandLineInterface() {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -44,6 +46,7 @@ func (cli *CLI) StartCommandLineInterface() {
 	}
 }
 
+// prints a help menu for the user
 func printHelp() {
 	fmt.Println("Available commands:")
 	fmt.Println("  add <\"title\"> [-d <description>] - Add a new task with the specified title and optional description.")
@@ -53,6 +56,7 @@ func printHelp() {
 	fmt.Println("  help - Display this help message.")
 }
 
+// handleCommand processes the command based on the provided arguments and returns an exit code and an error if any.
 func (cli *CLI) handleCommand(args []string) (int, error) {
 	if len(args) == 0 {
 		fmt.Println("No command provided. Type 'help' for available commands.")
