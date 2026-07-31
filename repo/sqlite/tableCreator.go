@@ -8,9 +8,9 @@ import (
 
 func createTable(db *sql.DB) (sql.Result, error) {
 	sql := `CREATE TABLE IF NOT EXISTS tasks (
-        name TEXT PRIMARY KEY,
+        title TEXT PRIMARY KEY,
         description TEXT,
-        status INTEGER NOT NULL
+        done INTEGER NOT NULL
     );`
 
 	return db.Exec(sql)
