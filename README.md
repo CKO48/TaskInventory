@@ -19,6 +19,6 @@ As my first Go project, TaskInventory is meant to be a simple yet useful alterna
   - [ ] Testing – Improve my testing skills by writing meaningful and maintainable tests that help build scalable applications.
 
 ## Future goals in this project 🗓️
-- Adding flags (--c/--n) to the lsit command so you can list only completed or only in-progress task
+- Adding flags (--c/--n) to the list command so you can list only completed or only in-progress task
 - Add an option to add a date limit to the tasks - maybe even hour/minute limit (ex. --d "06/03/26" --h "14:57")
 - Make list mark completed task in green and task that exceed the date limit in red
